@@ -1,0 +1,1 @@
+file "fullscreen1.pcx": 0x9423, 768
