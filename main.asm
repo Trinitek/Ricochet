@@ -1,6 +1,7 @@
 
 main:
     call tickWait
+    call newTrajectory
     ret
 
 ; tickWait(void)

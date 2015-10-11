@@ -23,3 +23,4 @@ else if _target = target.mikeos
 end if
 
 include 'main.asm'
+include 'ball.asm'
