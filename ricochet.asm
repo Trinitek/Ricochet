@@ -8,6 +8,22 @@ macro enum eName*, [members*] {
         i = i + 1
 }
 
+; Compare st(0) to st(1), set ZF, PF, and CF accordingly, and pop twice.
+; DOSBox does not support FCOMI instructions, so they must be synthesized.
+macro fcomipp protect {
+    if protect ~ eq
+        pop ax
+    end if
+    
+    fcompp
+    fstsw ax
+    sahf
+    
+    if protect ~ eq
+        pop ax
+    end if
+}
+
 enum target,\
     dos,\
     mikeos
@@ -24,3 +40,7 @@ end if
 
 include 'main.asm'
 include 'ball.asm'
+include 'old-files/string.asm'
+    string.teletype
+    string.reverse
+    string.numberToString
