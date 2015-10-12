@@ -12,7 +12,7 @@ macro enum eName*, [members*] {
 ; DOSBox does not support FCOMI instructions, so they must be synthesized.
 macro fcomipp protect {
     if protect ~ eq
-        pop ax
+        push ax
     end if
     
     fcompp

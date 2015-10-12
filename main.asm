@@ -1,6 +1,6 @@
 
 main:
-    ;call newTrajectory
+    call newTrajectory
     mov di, buffer
     rept 20 {
         mov ax, word [ball.x]

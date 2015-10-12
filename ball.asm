@@ -2,7 +2,7 @@
 enum d, FWD, REV
 
 ball:
-    .angle          dd 3.322        ; ~ sin(pi/2) / log10(2)
+    .angle          dd 1.37         ; pi7/16
     .slope          dd 3.0 ;0.2 ;3.0
     .x              dw 160
     .y              dw 5
@@ -17,34 +17,31 @@ checkCollision:
 ;
 ; Recalculate the slope of the ball's trajectory for a new angle value.
 ;
-; if (cos(trajectory) - x) != 0.0
-;   ball.slope = (sin(trajectory) - y) / (cos(trajectory) - x)
+; if cos(slope) != 0.0
+;   ball.slope = sin(slope) / cos(slope)
 ; else
-;   ball.slope = (sin(trajectory) - y) / log10(2)
+;   ball.slope = log(10)2
 newTrajectory:
     finit
     
     fld dword [ball.angle]          ; st0 = angle
     fsincos                         ; st1 = sin(angle), st0 = cos(angle)
-    fild word [ball.y]
-    fsubr st0, st2                  ; st0 = sin - y
-    ffree st2                       ; destroy sin
-    fild word [ball.x]
-    fsubr st0, st2                  ; st0 = cos - x
-    ffree st2                       ; destroy cos
-    fldz                            ; push 0.0
-    fcomip st, st1                  ; st1 must not be zero
-    jnz @f                          ; set st0 to something non-zero
+    ftst                            ; compare st0 to 0.0
+    push ax                         ; ...can't divide by zero!
+    fstsw ax
+    sahf
+    pop ax
+    jz .alternativeSlope            ; ZF set if st0 == 0.0
     
-    .newDivisor:
-        fldlg2                      ; push log10(2) (~0.30)
-        faddp                       ; st0 = ~0.30, st1 = sin - y
-    @@:
+    fdivp                           ; st0 = tan(angle)
+    jmp .end
     
-    fdivp st1, st0                  ; st0 = st1 / st0 = slope
-    fstp dword [ball.slope]         ; store slope
+    .alternativeSlope:
+        fldlg2                      ; st0 = log(10)2
     
-    ret
+    .end:
+        fstp dword [ball.slope]
+        ret
  
 ; void nextPosition(void)
 ;
