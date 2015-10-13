@@ -2,14 +2,25 @@
 macro enum eName*, [members*] {
     common
         local i
-        i = 1
+        i = 0
     forward
         eName#.#members = i
         i = i + 1
 }
 
+macro bitfield bName*, [members*] {
+    common
+        enum bName#.bit, members
+        local i
+        i = 1
+    forward
+        bName#.#members = i
+        i = i * 2
+}
+
 ; Compare st(0) to st(1), set ZF, PF, and CF accordingly, and pop twice.
 ; DOSBox does not support FCOMI instructions, so they must be synthesized.
+; The 'protect' argument is an optional flag that preserves AX if defined.
 macro fcomipp protect {
     if protect ~ eq
         push ax
@@ -38,8 +49,12 @@ else if _target = target.mikeos
     org 32768
 end if
 
+include 'ball.inc'
+include 'field.inc'
+
 include 'main.asm'
 include 'ball.asm'
+include 'canvas.asm'
 include 'old-files/string.asm'
     string.teletype
     string.reverse

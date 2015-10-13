@@ -1,17 +1,125 @@
 
-enum d, FWD, REV
-
 ball:
-    .angle          dd 1.37         ; pi7/16
-    .slope          dd 3.0 ;0.2 ;3.0
+    .angle          dd 1.37         ; (pi)7/16
+    .slope          dd 3.0
     .x              dw 160
-    .y              dw 5
+    .y              dw 15
     .xOrigin        dw 160
-    .yOrigin        dw 5
-    .direction      db d.FWD
-    
+    .yOrigin        dw 15
+    .direction      dw 11b
+  
+; word <bitfield r> checkCollision(void)
+;
+; Test for the ball's hitbox touching any other hitbox, and return a corresponding
+; bitfield.
 checkCollision:
-    ret
+    push bx
+    xor ax, ax
+    
+    .verticalSurfaces:
+        ; Check for field border collisions
+        mov bx, word [ball.x]       ; Test left field border
+        cmp bx, field.xMin
+        jne @f
+        or ax, r.VMIN
+        jmp .horizontalSurfaces
+        
+        @@:
+        add bx, ball.width          ; Test right field border
+        cmp bx, field.xMax
+        jne @f
+        or ax, r.VMAX
+        jmp .horizontalSurfaces
+        
+        @@:
+    
+    .horizontalSurfaces:
+        ; Check for field border collisions
+        mov bx, word [ball.y]       ; Test bottom field border
+        cmp bx, field.yMin
+        jne @f
+        or ax, r.HMIN
+        jmp .end
+        
+        @@:
+        add bx, ball.height         ; Test top field border
+        cmp bx, field.yMax
+        jne @f
+        or ax, r.HMAX
+        jmp .end
+        
+        @@:
+    
+    .end:
+        pop bx
+        ret
+        
+; void ricochet(word <bitfield r> reflection)
+;
+; Adjust the ball's slope and direction value in accordance to the surface it's
+; bouncing off of.
+ricochet:
+    push bx
+    
+    .verticalSurfaces:
+        mov bx, ax
+        and bx, r.VMIN + r.VMAX     ; are at least one of the vertical bits set?
+        jz .horizontalSurfaces
+        
+        finit                       ; slope *= -1
+        fld dword [ball.slope]
+        fchs
+        fstp dword [ball.slope]
+        
+        btc word [ball.direction], d.bit.X
+                                    ; invert direction flag for X
+    
+    .horizontalSurfaces:
+        mov bx, ax
+        and bx, r.HMIN + r.HMAX     ; are at least one onf the horizontal bits set?
+        jz .newOrigin
+        
+        finit                       ; slope *= -1
+        fld dword [ball.slope]
+        fchs
+        fstp dword [ball.slope]
+        
+        btc word [ball.direction], d.bit.Y
+                                    ; invert direction flag for Y
+        
+    .newOrigin:
+        cmp ax, 0                   ; were any of the bits set?
+        jz .end
+        
+        bt ax, r.bit.VMIN           ; adjust coordinates in the event of a collision
+        jnc @f
+        inc word [ball.x]
+        jmp .set
+        @@:
+        bt ax, r.bit.VMAX
+        jnc @f
+        dec word [ball.x]
+        jmp .set
+        @@:
+        bt ax, r.bit.HMIN
+        jnc @f
+        inc word [ball.y]
+        jmp .set
+        @@:
+        bt ax, r.bit.HMAX
+        jnc @f
+        dec word [ball.y]
+        
+        @@:
+        .set:
+        mov ax, word [ball.x]       ; set origin point to current location
+        mov word [ball.xOrigin], ax
+        mov ax, word [ball.y]
+        mov word [ball.yOrigin], ax
+        
+    .end:
+        pop bx
+        ret
     
 ; void newTrajectory(void)
 ;
@@ -47,6 +155,7 @@ newTrajectory:
 ;
 ; Update the ball's X and Y values with respect to its slope and direction.
 nextPosition:
+    push ax
     finit
     
     fld dword [ball.slope]          ; st0 = slope
@@ -56,22 +165,13 @@ nextPosition:
     fcomipp                         ; compare 1.0 and abs(slope) ; pop twice
     jc .use_Y_axis                  ; carry set if 1.0 < abs(slope)
     
-    macro nextOnAxis axis* {
-        local goingFwd, goingRev, exit
-        
-        cmp [ball.direction], d.FWD
-        jne .#goingRev
-        
-        .#goingFwd:
-            inc axis
-            jmp .#exit
-        .#goingRev:
-            dec axis
-        .#exit:
-    }
-    
     .use_X_axis:                    ; X +- 1 ; Y = m(X - xOrigin) + yOrigin
-        nextOnAxis word [ball.x]
+        bt word [ball.direction], d.bit.X
+        jnc @f
+        add word [ball.x], 2
+        @@:
+        dec word [ball.x]
+        
         fild word [ball.x]          ; push X
         fisub word [ball.xOrigin]   ; st0 = X - xOrigin
         fmulp                       ; st0 *= m
@@ -80,7 +180,12 @@ nextPosition:
         jmp .end
         
     .use_Y_axis:                    ; Y +- 1 ; X = (Y - yOrigin)/m + xOrigin
-        nextOnAxis word [ball.y]
+        bt word [ball.direction], d.bit.Y
+        jnc @f
+        add word [ball.y], 2
+        @@:
+        dec word [ball.y]
+        
         fild word [ball.y]          ; push Y
         fisub word [ball.yOrigin]   ; st0 = Y - yOrigin
         fdivrp                      ; st0 /= m
@@ -88,4 +193,5 @@ nextPosition:
         fistp word [ball.x]         ; [ball.x] = st0
 
     .end:
+        pop ax
         ret
