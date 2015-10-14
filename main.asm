@@ -6,8 +6,11 @@ main:
     call initializeBall
     call newTrajectory
     
-    push 0xA000
-    pop es
+;    push 0xA000
+    mov ax, ds
+    add ax, 0x100
+    mov es, ax
+;    pop es
     mov cx, 5000
     
     .drawLines:
@@ -15,7 +18,7 @@ main:
     push cx
     mov cx, 500
     .pause:
-        call tickWait
+;        call tickWait
         loop .pause
     pop cx
     
@@ -29,6 +32,15 @@ main:
     stosb
     call nextPosition
     loop .drawLines
+    
+    push es
+    pop ds
+    mov ax, 0xA000
+    mov es, ax
+    xor di, di
+    mov si, di
+    mov cx, 320*200
+    rep movsb
     
     xor ax, ax
     int 0x16

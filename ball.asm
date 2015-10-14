@@ -162,7 +162,9 @@ nextPosition:
     fld st0                         ; push another copy of slope
     fabs                            ; st0 = abs(slope)
     fld1                            ; push 1.0
-    fcomipp                         ; compare 1.0 and abs(slope) ; pop twice
+    fcompp                          ; compare 1.0 and abs(slope) ; pop twice
+    fstsw ax
+    sahf
     jc .use_Y_axis                  ; carry set if 1.0 < abs(slope)
     
     .use_X_axis:                    ; X +- 1 ; Y = m(X - xOrigin) + yOrigin

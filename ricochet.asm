@@ -18,23 +18,6 @@ macro bitfield bName*, [members*] {
         i = i * 2
 }
 
-; Compare st(0) to st(1), set ZF, PF, and CF accordingly, and pop twice.
-; DOSBox does not support FCOMI instructions, so they must be synthesized.
-; The 'protect' argument is an optional flag that preserves AX if defined.
-macro fcomipp protect {
-    if protect ~ eq
-        push ax
-    end if
-    
-    fcompp
-    fstsw ax
-    sahf
-    
-    if protect ~ eq
-        pop ax
-    end if
-}
-
 enum target,\
     dos,\
     mikeos
