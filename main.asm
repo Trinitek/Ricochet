@@ -1,64 +1,24 @@
 
 main:
-    ;call initializeBall
-    ;
-    ;call newTrajectory
-    ;mov di, buffer
-    ;mov cx, 100
-    ;@@:
-    ;    call checkCollision
-    ;    call ricochet
-    ;    
-    ;    mov ax, word [ball.direction]
-    ;    call printBinary
-    ;    mov si, separator
-    ;    call string.teletype
-    ;    
-    ;    mov ax, word [ball.x]
-    ;    call string.numberToString
-    ;    mov si, di
-    ;    call string.teletype
-    ;    
-    ;    mov si, separator
-    ;    call string.teletype
-    ;    
-    ;    mov ax, word [ball.y]
-    ;    call string.numberToString
-    ;    mov si, di
-    ;    call string.teletype
-    ;    
-    ;    mov si, newline
-    ;    call string.teletype
-    ;    
-    ;    call nextPosition
-    ;loop @b
-    ;
-    ;xor ax, ax
-    ;int 0x16
-    ;jmp @f
-    ;;ret
-    ;
-    ;newline db 0x0D, 0x0A, 0
-    ;separator db ', ', 0
-    ;buffer db 10 dup ?
-    ;temp dw ?
-    ;notSup db "Not ", 0
-    ;sup db "supported", 0x0D, 0x0A, 0
-    ;
-    ;;;;
-    ;@@:
-    
     mov ax, 0x13
     int 0x10
-    call tickWait
+    
     call initializeBall
     call newTrajectory
+    
     push 0xA000
     pop es
     mov cx, 5000
     
-    @@:
-    call tickWait
+    .drawLines:
+    
+    push cx
+    mov cx, 500
+    .pause:
+        call tickWait
+        loop .pause
+    pop cx
+    
     call checkCollision
     call ricochet
     mov ax, word [ball.x]
@@ -68,7 +28,7 @@ main:
     mov al, 0x09
     stosb
     call nextPosition
-    loop @b
+    loop .drawLines
     
     xor ax, ax
     int 0x16
@@ -86,20 +46,59 @@ initializeBall:
     mov word [ball.direction], 11b
     ret
 
-; tickWait(void)
+; void initializeTimer(void)
+; Set speaker timer to divide 1.19 MHz by 16384, giving a ~14 ms period.
+initializeTimer:
+    push ax
+    cli
+    
+    mov al, 0xB6
+    out 0x43, al
+    mov ax, 16384
+    out 0x42, al
+    mov al, ah
+    out 0x42, al
+    
+    sti
+    pop ax
+    ret
+    
+; void tickWait(void)
 ; Busy-wait for 55 ms.
 tickWait:
     pusha
-
-    mov ah, 0
-    int 0x1A
-    mov bx, dx
-
+    
+    ;mov ah, 0
+    ;int 0x1A
+    ;mov bx, dx
+    ;
+    ;.spinwait1:
+    ;    mov ah, 0
+    ;    int 0x1A
+    ;    
+    ;    cmp bx, dx
+    ;    je .spinwait1
+    ;    
+    ;popa
+    ;ret
+    
+    macro readCount {
+        cli                         ; disable interrupts
+        mov al, 10000000b           ; read back count from speaker timer
+        out 0x43, al
+        in al, 0x40                 ; load low byte of count
+        mov ah, al
+        in al, 0x40                 ; load high byte of count
+        rol ax, 8
+        sti                         ; enable interrupts
+    }
+    
+    readCount
+    mov bx, ax
+    
     .spinwait:
-        mov ah, 0
-        int 0x1A
-        
-        cmp bx, dx
+        readCount
+        cmp ax, bx
         je .spinwait
     
     popa
