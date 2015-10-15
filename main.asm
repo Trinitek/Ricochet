@@ -1,46 +1,54 @@
 
 main:
+    call setVideoBufferSeg
+    cmp si, 0
+    jz @f
+    call string.teletype
+    ret
+    @@:
+    
+    call clearBuffer
+    
+    ;ret
+    ;
+    ;.buffer db 10 dup ?
+    
     mov ax, 0x13
     int 0x10
+    
+    call clearBuffer
     
     call initializeBall
     call newTrajectory
     
-;    push 0xA000
     mov ax, ds
-    add ax, 0x100
+    add ax, word [videoBufferSeg]
     mov es, ax
-;    pop es
     mov cx, 5000
     
     .drawLines:
+        push cx
+        mov cx, 1000
+        .pause:
+            call tickWait
+            loop .pause
+        pop cx
+        
+        call checkCollision
+        call ricochet
+        
+        mov ax, word [ball.x]
+        mov bx, word [ball.y]
+        call coordToPtr
+        mov di, ax
+        mov al, 0x09
+        stosb
+        call nextPosition
+        
+        call drawBuffer
+        call clearBuffer
     
-    push cx
-    mov cx, 500
-    .pause:
-;        call tickWait
-        loop .pause
-    pop cx
-    
-    call checkCollision
-    call ricochet
-    mov ax, word [ball.x]
-    mov bx, word [ball.y]
-    call coordToPtr
-    mov di, ax
-    mov al, 0x09
-    stosb
-    call nextPosition
-    loop .drawLines
-    
-    push es
-    pop ds
-    mov ax, 0xA000
-    mov es, ax
-    xor di, di
-    mov si, di
-    mov cx, 320*200
-    rep movsb
+        loop .drawLines
     
     xor ax, ax
     int 0x16
@@ -93,6 +101,8 @@ tickWait:
     ;    
     ;popa
     ;ret
+    ;
+    ;;;
     
     macro readCount {
         cli                         ; disable interrupts

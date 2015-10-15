@@ -38,7 +38,11 @@ include 'field.inc'
 include 'main.asm'
 include 'ball.asm'
 include 'canvas.asm'
+include 'sprites.asm'
 include 'old-files/string.asm'
     string.teletype
     string.reverse
     string.numberToString
+    
+align 16
+endOfProgram:
