@@ -7,11 +7,7 @@ main:
     ret
     @@:
     
-    call clearBuffer
-    
-    ;ret
-    ;
-    ;.buffer db 10 dup ?
+    finit
     
     mov ax, 0x13
     int 0x10
@@ -21,8 +17,7 @@ main:
     call initializeBall
     call newTrajectory
     
-    mov ax, ds
-    add ax, word [videoBufferSeg]
+    mov ax, word [videoBufferSeg]
     mov es, ax
     mov cx, 5000
     
@@ -84,25 +79,9 @@ initializeTimer:
     ret
     
 ; void tickWait(void)
-; Busy-wait for 55 ms.
+; Busy-wait for 14 ms.
 tickWait:
     pusha
-    
-    ;mov ah, 0
-    ;int 0x1A
-    ;mov bx, dx
-    ;
-    ;.spinwait1:
-    ;    mov ah, 0
-    ;    int 0x1A
-    ;    
-    ;    cmp bx, dx
-    ;    je .spinwait1
-    ;    
-    ;popa
-    ;ret
-    ;
-    ;;;
     
     macro readCount {
         cli                         ; disable interrupts

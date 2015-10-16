@@ -1,7 +1,7 @@
 
 videoBufferSeg      dw ?
 
-; word <si> setVideoBufferPtr(void)
+; word <si> setVideoBufferSeg(void)
 ; SI = ptr to error string, null if successful.
 setVideoBufferSeg:
     push ax
@@ -101,7 +101,8 @@ clearBuffer:
     mov es, ax
     xor di, di
     mov cx, (320*200)/2
-    xor ax, ax
+    ;xor ax, ax
+    mov ax, 0x0101
     rep stosw
     
     pop es
