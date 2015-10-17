@@ -84,8 +84,8 @@ drawBuffer:
     mov ax, 0xA000
     mov es, ax
     mov di, si
-    mov cx, (320*200)/2
-    rep movsw
+    mov cx, (320*200)/4
+    rep movsd
     
     pop es
     pop ds
@@ -100,10 +100,10 @@ clearBuffer:
     mov ax, word [videoBufferSeg]
     mov es, ax
     xor di, di
-    mov cx, (320*200)/2
+    mov cx, (320*200)/4
     ;xor ax, ax
-    mov ax, 0x0101
-    rep stosw
+    mov eax, 0x01010101
+    rep stosd
     
     pop es
     popa

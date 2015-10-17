@@ -59,11 +59,9 @@ checkCollision:
 ; Adjust the ball's slope and direction value in accordance to the surface it's
 ; bouncing off of.
 ricochet:
-    push bx
     
     .verticalSurfaces:
-        mov bx, ax
-        and bx, r.VMIN + r.VMAX     ; are at least one of the vertical bits set?
+        test ax, r.VMIN + r.VMAX    ; are at least one of the vertical bits set?
         jz .horizontalSurfaces
         
         ;finit                       ; slope *= -1
@@ -75,8 +73,7 @@ ricochet:
                                     ; invert direction flag for X
     
     .horizontalSurfaces:
-        mov bx, ax
-        and bx, r.HMIN + r.HMAX     ; are at least one onf the horizontal bits set?
+        test ax, r.HMIN + r.HMAX    ; are at least one onf the horizontal bits set?
         jz .newOrigin
         
         ;finit                       ; slope *= -1
@@ -118,7 +115,6 @@ ricochet:
         mov word [ball.yOrigin], ax
         
     .end:
-        pop bx
         ret
     
 ; void newTrajectory(void)
@@ -169,10 +165,12 @@ nextPosition:
     
     .use_X_axis:                    ; X +- 1 ; Y = m(X - xOrigin) + yOrigin
         bt word [ball.direction], d.bit.X
-        jnc @f
-        add word [ball.x], 2
-        @@:
+        jnc .x_dec
+        inc word [ball.x]
+        jmp @f
+        .x_dec:
         dec word [ball.x]
+        @@:
         
         fild word [ball.x]          ; push X
         fisub word [ball.xOrigin]   ; st0 = X - xOrigin
@@ -183,10 +181,12 @@ nextPosition:
         
     .use_Y_axis:                    ; Y +- 1 ; X = (Y - yOrigin)/m + xOrigin
         bt word [ball.direction], d.bit.Y
-        jnc @f
-        add word [ball.y], 2
-        @@:
+        jnc .y_dec
+        inc word [ball.y]
+        jmp @f
+        .y_dec:
         dec word [ball.y]
+        @@:
         
         fild word [ball.y]          ; push Y
         fisub word [ball.yOrigin]   ; st0 = Y - yOrigin

@@ -12,10 +12,10 @@ main:
     mov ax, 0x13
     int 0x10
     
-    call clearBuffer
-    
+    call initializeTimer
     call initializeBall
     call newTrajectory
+    call clearBuffer
     
     mov ax, word [videoBufferSeg]
     mov es, ax
@@ -41,7 +41,7 @@ main:
         call nextPosition
         
         call drawBuffer
-        call clearBuffer
+        ;call clearBuffer
     
         loop .drawLines
     
