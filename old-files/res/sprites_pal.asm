@@ -1,1 +1,0 @@
-file "sprites.pcx": 0x86B, 768

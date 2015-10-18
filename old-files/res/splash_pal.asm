@@ -1,1 +1,0 @@
-file "splash.pcx": 0x6A3, 768

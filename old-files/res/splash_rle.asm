@@ -1,1 +1,0 @@
-file "splash.pcx": 0x80, 0x6A2-128
