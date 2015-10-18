@@ -17,3 +17,4 @@ color ALPHA, 0, 0, 0
 color BLACK, 0, 0, 0
 color BLUE, 0, 0, 255
 color DARKBLUE, 0, 0, 127
+color LIGHTBLUE, 127, 127, 255

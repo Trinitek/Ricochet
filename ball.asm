@@ -1,12 +1,12 @@
 
 ball:
-    .angle          dd 1.37         ; (pi)7/16
-    .slope          dd 3.0
-    .x              dw 160
-    .y              dw 15
-    .xOrigin        dw 160
-    .yOrigin        dw 15
-    .direction      dw 11b
+    .angle          dd ?
+    .slope          dd ?
+    .x              dw ?
+    .y              dw ?
+    .xOrigin        dw ?
+    .yOrigin        dw ?
+    .direction      dw ?
   
 ; word <bitfield r> checkCollision(void)
 ;

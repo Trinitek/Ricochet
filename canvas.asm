@@ -10,7 +10,7 @@ setVideoBufferSeg:
     
     if _target = target.dos
         mov ah, 0x4A                ; resize program's memory space to free unused memory
-        mov bx, ds                  ; DOS allocates the largest block available for COM executables.
+        mov bx, ds                  ; DOS allocates the largest block available for COM executables
         push es
         mov es, bx
         mov bx, endOfProgram/16     ; 16 bytes per paragraph
@@ -101,7 +101,7 @@ clearBuffer:
     mov es, ax
     xor di, di
     mov cx, (320*200)/4
-    mov eax, c.DARKBLUE shl 24 or c.DARKBLUE shl 16 or c.DARKBLUE shl 8 or c.DARKBLUE
+    xor eax, eax
     rep stosd
     
     pop es

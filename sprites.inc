@@ -1,10 +1,13 @@
 
-ballSprite.height = 5
-ballSprite.width = 5
-struc ballSprite z*, a*, b* {
-    db z,a,a,a,z
-    db a,a,b,a,a
-    db a,b,b,b,a
-    db a,a,b,a,a
-    db z,a,a,a,z
+ballSprite.height = 7
+ballSprite.width = 7
+ballSprite.hotspot_xy = 3
+struc ballSprite z*, a*, b*, c* {
+    db z,z,b,b,b,z,z
+    db z,b,a,a,a,b,z
+    db b,a,c,c,c,a,b
+    db b,a,c,c,c,a,b
+    db b,a,c,c,c,a,b
+    db z,b,a,a,a,b,z
+    db z,z,b,b,b,z,z
 }

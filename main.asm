@@ -35,10 +35,10 @@ main:
         
         mov ax, word [ball.x]
         mov bx, word [ball.y]
-        call coordToPtr
-        mov di, ax
-        mov al, c.BLUE
-        stosb
+        sub ax, ballSprite.hotspot_xy
+        add bx, ballSprite.hotspot_xy
+        call drawBallSprite
+        
         call nextPosition
         
         call drawBuffer
