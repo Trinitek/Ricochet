@@ -3,7 +3,7 @@ main:
     call setVideoBufferSeg
     cmp si, 0
     jz @f
-    call string.teletype
+    call print
     ret
     @@:
     
@@ -12,6 +12,7 @@ main:
     mov ax, 0x13
     int 0x10
     
+    call loadPalette
     call initializeTimer
     call initializeBall
     call newTrajectory
@@ -36,12 +37,12 @@ main:
         mov bx, word [ball.y]
         call coordToPtr
         mov di, ax
-        mov al, 0x09
+        mov al, c.BLUE
         stosb
         call nextPosition
         
         call drawBuffer
-        ;call clearBuffer
+        call clearBuffer
     
         loop .drawLines
     
@@ -130,5 +131,24 @@ printBinary:
         loop .nextBit
         
     popa
+    ret
+    
+; void print(char* <si> str)
+print:
+    push ax
+    push si
+    
+    mov ah, 0x0E
+    .nextChar:
+        lodsb
+        cmp al, 0
+        jz .end
+        int 0x10
+        jmp .nextChar
+        
+    .end:
+    
+    pop si
+    pop ax
     ret
     

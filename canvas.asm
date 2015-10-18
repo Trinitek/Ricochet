@@ -101,8 +101,7 @@ clearBuffer:
     mov es, ax
     xor di, di
     mov cx, (320*200)/4
-    ;xor ax, ax
-    mov eax, 0x01010101
+    mov eax, c.DARKBLUE shl 24 or c.DARKBLUE shl 16 or c.DARKBLUE shl 8 or c.DARKBLUE
     rep stosd
     
     pop es
