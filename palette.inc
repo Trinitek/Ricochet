@@ -18,3 +18,8 @@ color BLACK, 0, 0, 0
 color BLUE, 0, 0, 255
 color DARKBLUE, 0, 0, 127
 color LIGHTBLUE, 127, 127, 255
+color WHITE20, 51, 51, 51
+color WHITE40, 102, 102, 102
+color WHITE60, 153, 153, 153
+color WHITE80, 204, 204, 204
+color WHITE, 255, 255, 255

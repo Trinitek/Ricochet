@@ -14,34 +14,97 @@ drawBallSprite:
     mov di, ax
     pop ax
     
-    mov cx, ballSprite.width
-    .next_Y:
-        cmp bx, 200
-        jae .next_Y_end
-        
+    mov cx, ballSprite.height
+    .nextY:
         push cx
-        mov cx, ballSprite.height
-        .next_X:
+        mov cx, ballSprite.width
+        .nextX:
             cmp ax, 320
-            jae .next_X_end
-            
+            ja @f
+            cmp bx, 200
+            ja @f
+        
             mov dl, byte [ds:si]
+            cmp dl, c.ALPHA
+            je @f
             mov byte [es:di], dl
-            
-            .next_X_end:
-            inc ax
+        
+            @@:
             inc si
             inc di
-            loop .next_X
-            pop cx
+            inc ax
+            loop .nextX
+        pop cx
         
-        .next_Y_end:
-        add di, 320
-        sub di, ballSprite.width
-        sub ax, ballSprite.width
-        loop .next_Y
+        add di, 320 - ballSprite.width
+        dec bx
+        loop .nextY
     
     .end:
+    
+    popa
+    ret
+    
+; void drawBorder(void)
+drawBorder:
+    pusha
+    
+    mov ax, field.xMin - 9
+    mov bx, field.yMax
+    mov cx, field.yMax - field.yMin + 1
+    mov dl, c.WHITE20
+    call vertLine
+    inc ax
+    mov dl, c.WHITE40
+    call vertLine
+    inc ax
+    mov dl, c.WHITE60
+    call vertLine
+    inc ax
+    mov dl, c.WHITE80
+    call vertLine
+    inc ax
+    mov dl, c.WHITE
+    call vertLine
+    inc ax
+    mov dl, c.WHITE80
+    call vertLine
+    inc ax
+    mov dl, c.WHITE60
+    call vertLine
+    inc ax
+    mov dl, c.WHITE40
+    call vertLine
+    inc ax
+    mov dl, c.WHITE20
+    call vertLine
+    
+    popa
+    ret
+    
+; void vertLine(word x, word y, word length, byte <dl> color)
+vertLine:
+    pusha
+    
+    call coordToPtr
+    mov di, ax
+    
+    .nextY:
+        mov byte [es:di], dl
+        add di, 320
+        loop .nextY
+    
+    popa
+    ret
+
+; void horizLine(word x, word y, word length, byte <dl> color)
+horizLine:
+    pusha
+    
+    call coordToPtr
+    mov di, ax
+    mov al, dl
+    rep stosb
     
     popa
     ret

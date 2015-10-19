@@ -58,7 +58,7 @@ coordToPtr:
     push dx
     
     ; Move (0,0) origin from top left to bottom left of canvas
-    mov dx, 200
+    mov dx, 199
     sub dx, bx
     
     mov bx, ax                      ; bx = x

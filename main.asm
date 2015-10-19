@@ -26,12 +26,14 @@ main:
         push cx
         mov cx, 1000
         .pause:
-            call tickWait
+            ;call tickWait
             loop .pause
         pop cx
         
         call checkCollision
         call ricochet
+        
+        call drawBorder
         
         mov ax, word [ball.x]
         mov bx, word [ball.y]
