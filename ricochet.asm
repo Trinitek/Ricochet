@@ -22,9 +22,12 @@ enum target,\
     dos,\
     mikeos
 
-define _target target.dos
+;define _target target.dos
 
-if _target = target.dos
+if ~ defined _target
+    display '!! No build target specified!', 0x0D, 0x0A
+    err
+else if _target = target.dos
     display 'Building for DOS', 0x0D, 0x0A
     org 0x100
 else if _target = target.mikeos
