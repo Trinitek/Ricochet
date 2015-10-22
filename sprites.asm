@@ -49,35 +49,48 @@ drawBallSprite:
 drawBorder:
     pusha
     
+    macro d_border axis*, lineType* {
+        mov dl, c.WHITE20
+        call lineType
+        inc axis
+        mov dl, c.WHITE40
+        call lineType
+        inc axis
+        mov dl, c.WHITE60
+        call lineType
+        inc axis
+        mov dl, c.WHITE80
+        call lineType
+        inc axis
+        mov dl, c.WHITE
+        call lineType
+        inc axis
+        mov dl, c.WHITE80
+        call lineType
+        inc axis
+        mov dl, c.WHITE60
+        call lineType
+        inc axis
+        mov dl, c.WHITE40
+        call lineType
+        inc axis
+        mov dl, c.WHITE20
+        call lineType
+    }
+    
     mov ax, field.xMin - 9
     mov bx, field.yMax
     mov cx, field.yMax - field.yMin + 1
-    mov dl, c.WHITE20
-    call vertLine
-    inc ax
-    mov dl, c.WHITE40
-    call vertLine
-    inc ax
-    mov dl, c.WHITE60
-    call vertLine
-    inc ax
-    mov dl, c.WHITE80
-    call vertLine
-    inc ax
-    mov dl, c.WHITE
-    call vertLine
-    inc ax
-    mov dl, c.WHITE80
-    call vertLine
-    inc ax
-    mov dl, c.WHITE60
-    call vertLine
-    inc ax
-    mov dl, c.WHITE40
-    call vertLine
-    inc ax
-    mov dl, c.WHITE20
-    call vertLine
+    d_border ax, vertLine
+    
+    mov ax, field.xMax
+    mov bx, field.yMax
+    d_border ax, vertLine
+    
+    mov ax, field.xMin - 1
+    mov bx, field.yMax
+    mov cx, field.xMax - field.xMin + 2
+    d_border bx, horizLine
     
     popa
     ret
