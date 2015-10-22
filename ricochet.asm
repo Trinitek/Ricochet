@@ -22,8 +22,6 @@ enum target,\
     dos,\
     mikeos
 
-;define _target target.dos
-
 if ~ defined _target
     display '!! No build target specified!', 0x0D, 0x0A
     err

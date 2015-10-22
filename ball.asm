@@ -64,8 +64,7 @@ ricochet:
         test ax, r.VMIN + r.VMAX    ; are at least one of the vertical bits set?
         jz .horizontalSurfaces
         
-        ;finit                       ; slope *= -1
-        fld dword [ball.slope]
+        fld dword [ball.slope]      ; slope *= -1
         fchs
         fstp dword [ball.slope]
         
@@ -73,11 +72,10 @@ ricochet:
                                     ; invert direction flag for X
     
     .horizontalSurfaces:
-        test ax, r.HMIN + r.HMAX    ; are at least one onf the horizontal bits set?
+        test ax, r.HMIN + r.HMAX    ; are at least one of the horizontal bits set?
         jz .newOrigin
         
-        ;finit                       ; slope *= -1
-        fld dword [ball.slope]
+        fld dword [ball.slope]      ; slope *= -1
         fchs
         fstp dword [ball.slope]
         
@@ -126,8 +124,6 @@ ricochet:
 ; else
 ;   ball.slope = log(10)2
 newTrajectory:
-    ;finit
-    
     fld dword [ball.angle]          ; st0 = angle
     fsincos                         ; st1 = sin(angle), st0 = cos(angle)
     ftst                            ; compare st0 to 0.0
@@ -152,7 +148,6 @@ newTrajectory:
 ; Update the ball's X and Y values with respect to its slope and direction.
 nextPosition:
     push ax
-    ;finit
     
     fld dword [ball.slope]          ; st0 = slope
     fld st0                         ; push another copy of slope
