@@ -1,5 +1,6 @@
 
-videoBufferSeg      dw ?
+bufferA             dw ?
+bufferB             dw ?
 
 ; word <si> setVideoBufferSeg(void)
 ; SI = ptr to error string, null if successful.
@@ -17,33 +18,48 @@ setVideoBufferSeg:
         int 0x21
         pop es
         
-        mov ah, 0x48                ; allocate memory for buffer
+        macro errorHandle_malloc _bufferPtr* {
+            local allOk
+        
+            jc @f                   ; no error?
+            mov word [_bufferPtr], ax
+            xor si, si              ; null si, save segment
+            jmp .#allOk
+            
+            @@:
+            cmp ax, 0x07            ; error code 0x07?
+            jne @f
+            mov si, err_mcb
+            jmp .end
+            
+            @@:
+            mov si, err_nomem       ; error code 0x08?
+            jmp .end
+            
+            .#allOk:
+        }
+        
+        mov ah, 0x48                ; allocate memory for bufferA
         mov bx, (320*200)/16        ; 16 bytes per paragraph
         int 0x21
+        errorHandle_malloc bufferA  ; handle any errors
         
-        jc @f                       ; no error?
-        mov word [videoBufferSeg], ax
-        xor si, si                  ; null si, save segment
-        jmp .end
+        mov ah, 0x48                ; allocate memory for bufferB
+        mov bx, (320*200)/16        ; 16 bytes per paragraph
+        int 0x21
+        errorHandle_malloc bufferB  ; handle any errors
         
-        @@:
-        cmp ax, 0x07                ; error code 0x07?
-        jne @f
-        mov si, .err_mcb
-        jmp .end
-        
-        .nomem:
-        @@:
-        mov si, .err_nomem          ; error code 0x08?
-        jmp .end
-        
-        .err_mcb    db "Can't allocate video buffer: memory control block destroyed", 0x0D, 0x0A, 0
-        .err_nomem  db "Can't allocate video buffer: insufficient memory", 0x0D, 0x0A, 0
+        postpone {
+            err_mcb:
+                    db "Can't allocate video buffer: memory control block destroyed", 0x0D, 0x0A, 0
+            err_nomem:
+                    db "Can't allocate video buffer: insufficient memory", 0x0D, 0x0A, 0
+        }
         
     else if _target = target.mikeos
         mov ax, ds
         add ax, 0x100
-        mov word [videoBufferSeg], ax
+        mov word [bufferA], ax
     end if
     
     .end:
@@ -78,7 +94,7 @@ drawBuffer:
     push ds
     push es
     
-    mov ax, word [videoBufferSeg]
+    mov ax, word [bufferA]
     mov ds, ax
     xor si, si
     mov ax, 0xA000
@@ -97,7 +113,7 @@ clearBuffer:
     pusha
     push es
     
-    mov ax, word [videoBufferSeg]
+    mov ax, word [bufferA]
     mov es, ax
     xor di, di
     mov cx, (320*200)/4
