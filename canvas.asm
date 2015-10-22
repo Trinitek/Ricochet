@@ -58,8 +58,10 @@ setVideoBufferSeg:
         
     else if _target = target.mikeos
         mov ax, ds
-        add ax, 0x100
+        add ax, 0x1000
         mov word [bufferA], ax
+        add ax, 0x1000
+        mov word [bufferB], ax
     end if
     
     .end:
@@ -88,39 +90,27 @@ coordToPtr:
     pop bx
     ret
 
-; void drawBuffer(void)
+; void drawBuffer(word <ds> seg_srcBuffer, word <es> seg_destBuffer)
 drawBuffer:
     pusha
-    push ds
-    push es
     
-    mov ax, word [bufferA]
-    mov ds, ax
     xor si, si
-    mov ax, 0xA000
-    mov es, ax
     mov di, si
     mov cx, (320*200)/4
     rep movsd
     
-    pop es
-    pop ds
     popa
     ret
     
-; void clearBuffer(void)
+; void clearBuffer(word <es> seg_destBuffer)
 clearBuffer:
     pusha
-    push es
     
-    mov ax, word [bufferA]
-    mov es, ax
     xor di, di
     mov cx, (320*200)/4
     xor eax, eax
     rep stosd
     
-    pop es
     popa
     ret
     
