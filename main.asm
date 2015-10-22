@@ -18,7 +18,7 @@ main:
     call newTrajectory
     call clearBuffer
     
-    mov ax, word [videoBufferSeg]
+    mov ax, word [bufferA]
     mov es, ax
     mov cx, 5000
     
