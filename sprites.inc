@@ -11,3 +11,11 @@ struc ballSprite z*, a*, b*, c* {
     db z,b,a,a,a,b,z
     db z,z,b,b,b,z,z
 }
+
+vertWallSprite.height = 1
+vertWallSprite.width = 9
+horizWallSprite.height = 9
+horizWallSprite.width = 1
+struc hvWallSprite a*, b*, c*, d*, e*, f*, g*, h*, i* {
+    db a,b,c,d,e,f,g,h,i
+}
