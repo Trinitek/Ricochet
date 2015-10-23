@@ -1,5 +1,6 @@
 
 main:
+
     call setVideoBufferSeg
     cmp si, 0
     jz @f
@@ -16,13 +17,21 @@ main:
     call initializeTimer
     call initializeBall
     call newTrajectory
-    call clearBuffer
     
-    mov ax, word [bufferA]
+    mov ax, word [bufferB]          ; clear buffer B
     mov es, ax
+    call clearBuffer
+    call drawBorder                 ; draw background elements
+    
     mov cx, 5000
     
+    ;jmp @f
+    
     .drawLines:
+        mov ax, cs                  ; DS = CS
+        mov ds, ax
+    
+        push cx
         push cx
         mov cx, 1000
         .pause:
@@ -33,25 +42,45 @@ main:
         call checkCollision
         call ricochet
         
-        call drawBorder
+        mov ax, word [bufferA]      ; draw buffer B to buffer A
+        mov es, ax
+        mov ax, word [bufferB]
+        mov ds, ax
+        call drawBuffer
+        
+        mov ax, cs                  ; DS = CS
+        mov ds, ax
         
         mov ax, word [ball.x]
         mov bx, word [ball.y]
         sub ax, ballSprite.hotspot_xy
         add bx, ballSprite.hotspot_xy
-        call drawBallSprite
+        mov cx, ballSprite.height
+        mov dx, ballSprite.width
+        mov si, sprites.ball
+        call drawSprite
         
         call nextPosition
         
+        mov ax, 0xA000              ; draw buffer A to screen
+        mov es, ax
+        mov ax, word [bufferA]
+        mov ds, ax
         call drawBuffer
-        call clearBuffer
     
+        pop cx
         loop .drawLines
+    
+    @@:
     
     xor ax, ax
     int 0x16
     mov ax, 0x03
     int 0x10
+    
+    jmp cleanup
+    
+cleanup:
     ret
     
 initializeBall:

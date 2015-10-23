@@ -14,7 +14,7 @@ setVideoBufferSeg:
         mov bx, ds                  ; DOS allocates the largest block available for COM executables
         push es
         mov es, bx
-        mov bx, endOfProgram/16     ; 16 bytes per paragraph
+        mov bx, 0x1000              ; resize for 64k; 16 bytes per paragraph
         int 0x21
         pop es
         
