@@ -19,3 +19,31 @@ horizWallSprite.width = 1
 struc hvWallSprite a*, b*, c*, d*, e*, f*, g*, h*, i* {
     db a,b,c,d,e,f,g,h,i
 }
+
+leftCornerSprite.height = 9
+leftCornerSprite.width = 9
+struc leftCornerSprite a*, b*, c*, d*, e*, f*, g*, h*, i* {
+    db a,a,a,a,a,a,a,a,a
+    db a,b,b,b,b,b,b,b,b
+    db a,b,c,c,c,c,c,c,c
+    db a,b,c,d,d,d,d,d,d
+    db a,b,c,d,e,e,e,e,e
+    db a,b,c,d,e,f,f,f,f
+    db a,b,c,d,e,f,g,g,g
+    db a,b,c,d,e,f,g,h,h
+    db a,b,c,d,e,f,g,h,i
+}
+
+rightCornerSprite.height = 9
+rightCornerSprite.width = 9
+struc rightCornerSprite a*, b*, c*, d*, e*, f*, g*, h*, i* {
+    db a,a,a,a,a,a,a,a,i
+    db b,b,b,b,b,b,b,h,i
+    db c,c,c,c,c,c,g,h,i
+    db d,d,d,d,d,f,g,h,i
+    db e,e,e,e,e,f,g,h,i
+    db f,f,f,d,e,f,g,h,i
+    db g,g,c,d,e,f,g,h,i
+    db h,b,c,d,e,f,g,h,i
+    db a,b,c,d,e,f,g,h,i
+}

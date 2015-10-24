@@ -15,6 +15,27 @@ sprites:
         c.WHITE60,\
         c.WHITE40,\
         c.WHITE20
+    .lCorner leftCornerSprite\
+        c.WHITE20,\
+        c.WHITE40,\
+        c.WHITE60,\
+        c.WHITE80,\
+        c.WHITE,\
+        c.WHITE80,\
+        c.WHITE60,\
+        c.WHITE40,\
+        c.WHITE20
+    
+    .rCorner rightCornerSprite\
+        c.WHITE20,\
+        c.WHITE40,\
+        c.WHITE60,\
+        c.WHITE80,\
+        c.WHITE,\
+        c.WHITE80,\
+        c.WHITE60,\
+        c.WHITE40,\
+        c.WHITE20
 
 ; void drawSprite(word x, word y, word height, word width, word <si> spritePtr)
 ; Assumes DS is set to the data segment and ES to any video buffer
@@ -27,6 +48,7 @@ drawSprite:
     pop ax
     
     .nextY:
+        push ax
         push cx
         push dx
         mov cx, dx
@@ -48,6 +70,7 @@ drawSprite:
             loop .nextX
         pop dx
         pop cx
+        pop ax
         
         add di, 320
         sub di, dx
@@ -99,6 +122,19 @@ drawBorder:
         pop cx
         inc ax
         loop .horiz
+    
+    mov ax, field.xMin - 9
+    mov bx, field.yMax + leftCornerSprite.height - 1
+    mov cx, leftCornerSprite.height
+    mov dx, leftCornerSprite.width
+    mov si, sprites.lCorner
+    call drawSprite
+    
+    mov ax, field.xMax
+    mov cx, rightCornerSprite.height
+    mov dx, rightCornerSprite.width
+    mov si, sprites.rCorner
+    call drawSprite
     
     popa
     ret
