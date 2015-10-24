@@ -40,7 +40,7 @@ include 'sprites.inc'
 
 include 'main.asm'
 include 'ball.asm'
-include 'canvas.asm'
+include 'buffer.asm'
 include 'sprites.asm'
 include 'palette.asm'
 
