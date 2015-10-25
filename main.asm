@@ -59,10 +59,7 @@ main:
         mov bx, word [ball.y]
         sub ax, ballSprite.hotspot_xy
         add bx, ballSprite.hotspot_xy
-        mov cx, ballSprite.height
-        mov dx, ballSprite.width
-        mov si, sprites.ball
-        call drawSprite
+        call drawBall
         
         call nextPosition
         

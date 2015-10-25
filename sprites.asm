@@ -184,6 +184,19 @@ drawPaddle:
     popa
     ret
     
+; void drawBall(word x, word y)
+; Expect ES to point to buffer A
+drawBall:
+    pusha
+    
+    mov cx, ballSprite.height
+    mov dx, ballSprite.width
+    mov si, sprites.ball
+    call drawSprite
+    
+    popa
+    ret
+    
 ; void vertLine(word x, word y, word length, byte <dl> color)
 vertLine:
     pusha
