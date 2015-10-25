@@ -188,7 +188,8 @@ drawPaddle:
 ; Expect ES to point to buffer A
 drawBall:
     pusha
-    
+    sub ax, ballSprite.hotspot_xy
+    add bx, ballSprite.hotspot_xy
     mov cx, ballSprite.height
     mov dx, ballSprite.width
     mov si, sprites.ball

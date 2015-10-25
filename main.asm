@@ -57,8 +57,6 @@ main:
         
         mov ax, word [ball.x]
         mov bx, word [ball.y]
-        sub ax, ballSprite.hotspot_xy
-        add bx, ballSprite.hotspot_xy
         call drawBall
         
         call nextPosition
