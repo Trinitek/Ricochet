@@ -19,14 +19,13 @@ main:
     call newTrajectory
     
     mov ax, word [bufferB]          ; clear buffer B
-    mov ax, 0xA000
     mov es, ax
     call clearBuffer
     call drawBorder                 ; draw background elements
     
     mov cx, 5000
     
-    jmp @f
+    ;jmp @f
     
     .drawLines:
         mov ax, cs                  ; DS = CS
@@ -51,6 +50,10 @@ main:
         
         mov ax, cs                  ; DS = CS
         mov ds, ax
+        
+        mov ax, 65
+        mov bx, 20
+        call drawPaddle
         
         mov ax, word [ball.x]
         mov bx, word [ball.y]

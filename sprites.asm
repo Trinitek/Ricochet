@@ -2,9 +2,9 @@
 sprites:
     .ball ballSprite\
         c.ALPHA,\
-        c.BLUE,\
         c.LIGHTBLUE,\
-        c.DARKBLUE
+        c.AQUA,\
+        c.BLUE
     .wall hvWallSprite\
         c.WHITE20,\
         c.WHITE40,\
@@ -25,7 +25,6 @@ sprites:
         c.WHITE60,\
         c.WHITE40,\
         c.WHITE20
-    
     .rCorner rightCornerSprite\
         c.WHITE20,\
         c.WHITE40,\
@@ -36,6 +35,22 @@ sprites:
         c.WHITE60,\
         c.WHITE40,\
         c.WHITE20
+    .lPaddle leftPaddleCapSprite\
+        c.ALPHA,\
+        c.AQUA,\
+        c.LIGHTBLUE,\
+        c.BLUE,\
+        c.DARKBLUE
+    .rPaddle rightPaddleCapSprite\
+        c.ALPHA,\
+        c.AQUA,\
+        c.LIGHTBLUE,\
+        c.BLUE,\
+        c.DARKBLUE
+    .paddle paddleBodySprite\
+        c.AQUA,\
+        c.DARKBLUE,\
+        c.BLUE
 
 ; void drawSprite(word x, word y, word height, word width, word <si> spritePtr)
 ; Assumes DS is set to the data segment and ES to any video buffer
@@ -134,6 +149,36 @@ drawBorder:
     mov cx, rightCornerSprite.height
     mov dx, rightCornerSprite.width
     mov si, sprites.rCorner
+    call drawSprite
+    
+    popa
+    ret
+    
+; void drawPaddle(word x, word y)
+; Expect ES to point to buffer A
+drawPaddle:
+    pusha
+    
+    mov cx, leftPaddleCapSprite.height
+    mov dx, leftPaddleCapSprite.width
+    mov si, sprites.lPaddle
+    call drawSprite
+    
+    add ax, leftPaddleCapSprite.width
+    mov dx, paddleBodySprite.width
+    mov si, sprites.paddle
+    mov cx, 30
+    .drawBody:
+        push cx
+        mov cx, paddleBodySprite.height
+        call drawSprite
+        inc ax
+        pop cx
+        loop .drawBody
+    
+    mov cx, rightPaddleCapSprite.height
+    mov dx, rightPaddleCapSprite.width
+    mov si, sprites.rPaddle
     call drawSprite
     
     popa

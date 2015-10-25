@@ -47,3 +47,37 @@ struc rightCornerSprite a*, b*, c*, d*, e*, f*, g*, h*, i* {
     db h,b,c,d,e,f,g,h,i
     db a,b,c,d,e,f,g,h,i
 }
+
+leftPaddleCapSprite.height = 9
+leftPaddleCapSprite.width = 5
+struc leftPaddleCapSprite z*, a*, b*, c*, d* {
+    db z,z,a,a,a
+    db z,a,b,c,d
+    db a,b,c,d,a
+    db a,b,c,d,d
+    db a,b,c,d,a
+    db a,b,c,d,d
+    db a,b,c,d,a
+    db z,a,b,c,d
+    db z,z,a,a,a
+}
+
+rightPaddleCapSprite.height = 9
+rightPaddleCapSprite.width = 5
+struc rightPaddleCapSprite z*, a*, b*, c*, d* {
+    db a,a,a,z,z
+    db d,c,b,a,z
+    db a,d,c,b,a
+    db d,d,c,b,a
+    db a,d,c,b,a
+    db d,d,c,b,a
+    db a,d,c,b,a
+    db d,c,b,a,z
+    db a,a,a,z,z
+}
+
+paddleBodySprite.height = 9
+paddleBodySprite.width = 1
+struc paddleBodySprite a*, b*, c* {
+    db a,b,c,b,c,b,c,b,a
+}
