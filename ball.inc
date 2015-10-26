@@ -1,5 +1,5 @@
 
-define ball.width 1
+define ball.width 1                 ; width/height of the hotspot, not the sprite
 define ball.height 1
 
 bitfield d,\

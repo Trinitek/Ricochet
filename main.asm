@@ -25,6 +25,13 @@ main:
     
     mov cx, 5000
     
+    mov word [paddle.x], 70
+    mov word [paddle.y], 20
+    
+    postpone {
+        paddleDirection db 1
+    }
+    
     ;jmp @f
     
     .drawLines:
@@ -39,7 +46,7 @@ main:
             loop .pause
         pop cx
         
-        call checkCollision
+        call checkBallCollision
         call ricochet
         
         mov ax, word [bufferA]      ; draw buffer B to buffer A
@@ -51,9 +58,24 @@ main:
         mov ax, cs                  ; DS = CS
         mov ds, ax
         
-        mov ax, 65
-        mov bx, 20
+        mov ax, word [paddle.x]
+        mov bx, word [paddle.y]
         call drawPaddle
+        
+        call checkPaddleCollision
+        cmp ax, pside.LEFT
+        jne @f
+        mov byte [paddleDirection], 1
+        jmp .paddleCollisionEnd
+        @@:
+        cmp ax, pside.RIGHT
+        jne @f
+        mov byte [paddleDirection], -1
+        @@:
+        .paddleCollisionEnd:
+        mov al, byte [paddleDirection]
+        cbw
+        add word [paddle.x], ax
         
         mov ax, word [ball.x]
         mov bx, word [ball.y]

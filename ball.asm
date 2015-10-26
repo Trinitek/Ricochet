@@ -8,11 +8,11 @@ ball:
     .yOrigin        dw ?
     .direction      dw ?
   
-; word <bitfield r> checkCollision(void)
+; word <bitfield r> checkBallCollision(void)
 ;
 ; Test for the ball's hitbox touching any other hitbox, and return a corresponding
 ; bitfield.
-checkCollision:
+checkBallCollision:
     push bx
     xor ax, ax
     

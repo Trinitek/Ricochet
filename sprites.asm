@@ -167,7 +167,7 @@ drawPaddle:
     add ax, leftPaddleCapSprite.width
     mov dx, paddleBodySprite.width
     mov si, sprites.paddle
-    mov cx, 30
+    mov cx, paddle.width - leftPaddleCapSprite.width - rightPaddleCapSprite.width
     .drawBody:
         push cx
         mov cx, paddleBodySprite.height

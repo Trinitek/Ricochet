@@ -34,12 +34,14 @@ else if _target = target.mikeos
 end if
 
 include 'ball.inc'
+include 'paddle.inc'
 include 'field.inc'
 include 'palette.inc'
 include 'sprites.inc'
 
 include 'main.asm'
 include 'ball.asm'
+include 'paddle.asm'
 include 'buffer.asm'
 include 'sprites.asm'
 include 'palette.asm'
