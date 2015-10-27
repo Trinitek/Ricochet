@@ -23,7 +23,7 @@ main:
     call clearBuffer
     call drawBorder                 ; draw background elements
     
-    mov cx, 5000
+    mov cx, 0xFFFF
     
     mov word [paddle.x], 70
     mov word [paddle.y], 20

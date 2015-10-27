@@ -14,6 +14,7 @@ ball:
 ; bitfield.
 checkBallCollision:
     push bx
+    push cx
     xor ax, ax
     
     .verticalSurfaces:
@@ -29,6 +30,37 @@ checkBallCollision:
         cmp bx, field.xMax
         jne @f
         or ax, r.VMAX
+        jmp .horizontalSurfaces
+        
+        ; Check for paddle collisions
+        @@:
+        mov bx, word [ball.x]       ; Test left side of the paddle
+        cmp bx, word [paddle.x]
+        jne @f
+        mov cx, word [paddle.y]
+        mov bx, word [ball.y]
+        cmp bx, cx
+        ja @f
+        sub cx, paddle.height
+        cmp bx, cx
+        jb @f
+        or ax, r.VPADDLELEFT
+        jmp .horizontalSurfaces
+        
+        @@:
+        add bx, paddle.width        ; Test right side of the paddle
+        mov cx, word [paddle.x]
+        add cx, paddle.width
+        cmp bx, cx
+        jne @f
+        mov cx, word [paddle.y]
+        mov bx, word [ball.y]
+        cmp bx, cx
+        ja @f
+        sub cx, paddle.height
+        cmp bx, cx
+        jb @f
+        or ax, r.VPADDLERIGHT
         jmp .horizontalSurfaces
         
         @@:
@@ -48,9 +80,25 @@ checkBallCollision:
         or ax, r.HMAX
         jmp .end
         
+        ; Check for paddle collisions
+        @@:
+        mov bx, word [ball.y]
+        cmp bx, word [paddle.y]
+        jne @f
+        mov cx, word [paddle.x]
+        mov bx, word [ball.x]
+        cmp bx, cx
+        jb @f
+        add cx, paddle.width
+        cmp bx, cx
+        ja @f
+        or ax, r.HPADDLE
+        jmp .end
+        
         @@:
     
     .end:
+        pop cx
         pop bx
         ret
         
@@ -59,9 +107,10 @@ checkBallCollision:
 ; Adjust the ball's slope and direction value in accordance to the surface it's
 ; bouncing off of.
 ricochet:
+    push bx
     
     .verticalSurfaces:
-        test ax, r.VMIN + r.VMAX    ; are at least one of the vertical bits set?
+        test ax, r.VMIN or r.VMAX   ; are at least one of the vertical bits set?
         jz .horizontalSurfaces
         
         fld dword [ball.slope]      ; slope *= -1
@@ -70,17 +119,33 @@ ricochet:
         
         btc word [ball.direction], d.bit.X
                                     ; invert direction flag for X
-    
     .horizontalSurfaces:
-        test ax, r.HMIN + r.HMAX    ; are at least one of the horizontal bits set?
-        jz .newOrigin
-        
+        test ax, r.HMIN or r.HMAX or r.HPADDLE or r.VPADDLELEFT or r.VPADDLERIGHT
+        jz .newOrigin               ; are at least one of the horizontal bits set?
+                                    ; (vert paddle collisions are treated as horiz)
         fld dword [ball.slope]      ; slope *= -1
         fchs
         fstp dword [ball.slope]
         
         btc word [ball.direction], d.bit.Y
                                     ; invert direction flag for Y
+    .horizontalPaddle:
+        bt ax, r.bit.HPADDLE        ; is the horizontal paddle collision bit set?
+        jz .verticalPaddle
+    
+    .verticalPaddle:
+        bt ax, r.bit.VPADDLELEFT    ; left vertical side of paddle?
+        jnc @f
+        mov dword [ball.angle], ball.angleMax
+        call newTrajectory
+        
+        @@:
+        bt ax, r.bit.VPADDLERIGHT   ; right vertical side of paddle?
+        jnc @f
+        mov dword [ball.angle], ball.angleMin
+        call newTrajectory
+        
+        @@:
         
     .newOrigin:
         cmp ax, 0                   ; were any of the bits set?
@@ -104,6 +169,25 @@ ricochet:
         bt ax, r.bit.HMAX
         jnc @f
         dec word [ball.y]
+        jmp .set
+        @@:
+        test ax, r.VPADDLELEFT or r.VPADDLERIGHT
+        jnc @f
+        mov bx, word [paddle.x]
+        bt ax, r.bit.VPADDLERIGHT
+        jnc .notRightPaddle
+        add bx, paddle.width
+        .notRightPaddle:
+        mov word [ball.x], bx
+        mov bx, word [paddle.y]
+        inc bx
+        mov word [ball.y], bx
+        jmp .set
+        @@:
+        bt ax, r.bit.HPADDLE
+        jnc @f
+        inc word [ball.y]
+        jmp .set
         
         @@:
         .set:
@@ -113,6 +197,7 @@ ricochet:
         mov word [ball.yOrigin], ax
         
     .end:
+        pop bx
         ret
     
 ; void newTrajectory(void)
