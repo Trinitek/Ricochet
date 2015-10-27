@@ -219,11 +219,11 @@ ricochet:
         jmp .set
         
         @@:
-        .set:
-            mov ax, word [ball.x]   ; set origin point to current location
-            mov word [ball.xOrigin], ax
-            mov ax, word [ball.y]
-            mov word [ball.yOrigin], ax
+    .set:
+        mov ax, word [ball.x]   ; set origin point to current location
+        mov word [ball.xOrigin], ax
+        mov ax, word [ball.y]
+        mov word [ball.yOrigin], ax
         
     .end:
         pop bx
@@ -254,23 +254,10 @@ newTrajectory:
         fldlg2                      ; st0 = log(10)2
     
     .saveSlope:
-        fstp dword [ball.slope]     ; save slope, keep in st0
+        fstp dword [ball.slope]     ; save slope
     
     .setDirection:
-        fld dword [ball.angle]      ; load angle
-        fldpi                       ; load pi
-        fcompp                      ; compare pi and angle ; pop twice
-        push ax
-        fstsw ax
-        sahf
-        pop ax
-        jc @f                       ; carry set if pi < angle (positive slope)
-        
         bts word [ball.direction], d.bit.Y
-        jmp .end
-        
-        @@:
-        btr word [ball.direction], d.bit.Y
         
     .end:
         ret

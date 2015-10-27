@@ -46,9 +46,6 @@ main:
             loop .pause
         pop cx
         
-        ;cmp cx, 3000
-        ;ja .update
-        
         .draw:
             mov ax, word [bufferA]  ; draw buffer B to buffer A
             mov es, ax
