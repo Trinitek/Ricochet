@@ -1,7 +1,7 @@
 
 ballSprite.height = 7
 ballSprite.width = 7
-ballSprite.hotspot_xy = 3
+ballSprite.hotspot_xy = 3           ; offset from top left
 struc ballSprite z*, a*, b*, c* {
     db z,z,b,b,b,z,z
     db z,b,a,a,a,b,z

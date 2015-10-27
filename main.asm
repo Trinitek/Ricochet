@@ -23,7 +23,7 @@ main:
     call clearBuffer
     call drawBorder                 ; draw background elements
     
-    mov cx, 0xFFFF
+    mov cx, 10000
     
     mov word [paddle.x], 70
     mov word [paddle.y], 20
@@ -34,9 +34,9 @@ main:
     
     ;jmp @f
     
-    .drawLines:
-        mov ax, cs                  ; DS = CS
-        mov ds, ax
+    .mainLoop:
+        push cs                     ; DS = CS
+        pop ds
     
         push cx
         push cx
@@ -46,51 +46,58 @@ main:
             loop .pause
         pop cx
         
-        call checkBallCollision
-        call ricochet
+        ;cmp cx, 3000
+        ;ja .update
         
-        mov ax, word [bufferA]      ; draw buffer B to buffer A
-        mov es, ax
-        mov ax, word [bufferB]
-        mov ds, ax
-        call drawBuffer
+        .draw:
+            mov ax, word [bufferA]  ; draw buffer B to buffer A
+            mov es, ax
+            mov ax, word [bufferB]
+            mov ds, ax
+            call drawBuffer
+            
+            push cs                 ; DS = CS
+            pop ds
+            
+            mov ax, word [paddle.x]
+            mov bx, word [paddle.y]
+            call drawPaddle
+            
+            mov ax, word [ball.x]
+            mov bx, word [ball.y]
+            call drawBall
+            
+            mov ax, 0xA000          ; draw buffer A to screen
+            mov es, ax
+            mov ax, word [bufferA]
+            mov ds, ax
+            call drawBuffer
         
-        mov ax, cs                  ; DS = CS
-        mov ds, ax
-        
-        mov ax, word [paddle.x]
-        mov bx, word [paddle.y]
-        call drawPaddle
-        
-        call checkPaddleCollision
-        cmp ax, pside.LEFT
-        jne @f
-        mov byte [paddleDirection], 1
-        jmp .paddleCollisionEnd
-        @@:
-        cmp ax, pside.RIGHT
-        jne @f
-        mov byte [paddleDirection], -1
-        @@:
-        .paddleCollisionEnd:
-        mov al, byte [paddleDirection]
-        cbw
-        add word [paddle.x], ax
-        
-        mov ax, word [ball.x]
-        mov bx, word [ball.y]
-        call drawBall
-        
-        call nextPosition
-        
-        mov ax, 0xA000              ; draw buffer A to screen
-        mov es, ax
-        mov ax, word [bufferA]
-        mov ds, ax
-        call drawBuffer
-    
+        .update:
+            push cs
+            pop ds
+            
+            call checkBallCollision
+            call ricochet
+            call nextPosition
+            
+            call checkPaddleCollision
+            cmp ax, pside.LEFT
+            jne @f
+            mov byte [paddleDirection], 1
+            jmp .paddleCollisionEnd
+            @@:
+            cmp ax, pside.RIGHT
+            jne @f
+            mov byte [paddleDirection], -1
+            @@:
+            .paddleCollisionEnd:
+            mov al, byte [paddleDirection]
+            cbw
+            add word [paddle.x], ax
+            
         pop cx
-        loop .drawLines
+        loop .mainLoop
     
     @@:
     

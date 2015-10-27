@@ -82,7 +82,7 @@ checkBallCollision:
         
         ; Check for paddle collisions
         @@:
-        mov bx, word [ball.y]
+        mov bx, word [ball.y]       ; Test top of paddle
         cmp bx, word [paddle.y]
         jne @f
         mov cx, word [paddle.x]
@@ -120,18 +120,35 @@ ricochet:
         btc word [ball.direction], d.bit.X
                                     ; invert direction flag for X
     .horizontalSurfaces:
-        test ax, r.HMIN or r.HMAX or r.HPADDLE or r.VPADDLELEFT or r.VPADDLERIGHT
-        jz .newOrigin               ; are at least one of the horizontal bits set?
-                                    ; (vert paddle collisions are treated as horiz)
+        test ax, r.HMIN or r.HMAX
+        jz .horizontalPaddle        ; are at least one of the horizontal bits set?
+        
         fld dword [ball.slope]      ; slope *= -1
-        fchs
+        fchs                        ; this will be overwritten if it's a paddle collision
         fstp dword [ball.slope]
         
         btc word [ball.direction], d.bit.Y
                                     ; invert direction flag for Y
     .horizontalPaddle:
         bt ax, r.bit.HPADDLE        ; is the horizontal paddle collision bit set?
-        jz .verticalPaddle
+        jnc .verticalPaddle
+        
+        ; The full range of the possible angles is 2pi/3 radians, or pi/6 to 5pi/6.
+        ; This range is divided into however many pixels make up the paddle's width.
+        ; angle = (2pi/3 / paddle.width) * (paddle.x + paddle.width - ball.x) + pi/6
+        mov bx, word [paddle.x]
+        add bx, paddle.width
+        sub bx, word [ball.x]       ; bx = distance of ball from right side of paddle
+        mov word [ball.angle], bx   ; using [ball.angle] as a temporary variable
+        fild word [ball.angle]      ; load bx
+        mov dword [ball.angle], ball.angleRange
+        fmul dword [ball.angle]     ; st0 = bx * 2pi/3
+        mov word [ball.angle], paddle.width
+        fidiv word [ball.angle]     ; st0 /= paddle.width
+        mov dword [ball.angle], ball.angleMin
+        fadd dword [ball.angle]     ; st0 += pi/6
+        fst dword [ball.angle]      ; [ball.angle] = st0
+        call newTrajectory          ; Calculate new ball slope from angle
     
     .verticalPaddle:
         bt ax, r.bit.VPADDLELEFT    ; left vertical side of paddle?
@@ -155,34 +172,46 @@ ricochet:
         jnc @f
         inc word [ball.x]
         jmp .set
+        
         @@:
         bt ax, r.bit.VMAX
         jnc @f
         dec word [ball.x]
         jmp .set
+        
         @@:
         bt ax, r.bit.HMIN
         jnc @f
         inc word [ball.y]
         jmp .set
+        
         @@:
         bt ax, r.bit.HMAX
         jnc @f
         dec word [ball.y]
         jmp .set
+        
         @@:
-        test ax, r.VPADDLELEFT or r.VPADDLERIGHT
+        bt ax, r.bit.VPADDLELEFT
         jnc @f
         mov bx, word [paddle.x]
-        bt ax, r.bit.VPADDLERIGHT
-        jnc .notRightPaddle
-        add bx, paddle.width
-        .notRightPaddle:
         mov word [ball.x], bx
         mov bx, word [paddle.y]
         inc bx
         mov word [ball.y], bx
         jmp .set
+        
+        @@:
+        bt ax, r.bit.VPADDLERIGHT
+        jnc @f
+        mov bx, word [paddle.x]
+        add bx, paddle.width
+        mov word [ball.x], bx
+        mov bx, word [paddle.y]
+        inc bx
+        mov word [ball.y], bx
+        jmp .set
+        
         @@:
         bt ax, r.bit.HPADDLE
         jnc @f
@@ -191,10 +220,10 @@ ricochet:
         
         @@:
         .set:
-        mov ax, word [ball.x]       ; set origin point to current location
-        mov word [ball.xOrigin], ax
-        mov ax, word [ball.y]
-        mov word [ball.yOrigin], ax
+            mov ax, word [ball.x]   ; set origin point to current location
+            mov word [ball.xOrigin], ax
+            mov ax, word [ball.y]
+            mov word [ball.yOrigin], ax
         
     .end:
         pop bx
@@ -219,13 +248,31 @@ newTrajectory:
     jz .alternativeSlope            ; ZF set if st0 == 0.0
     
     fdivp                           ; st0 = tan(angle)
-    jmp .end
+    jmp .saveSlope
     
     .alternativeSlope:
         fldlg2                      ; st0 = log(10)2
     
+    .saveSlope:
+        fstp dword [ball.slope]     ; save slope, keep in st0
+    
+    .setDirection:
+        fld dword [ball.angle]      ; load angle
+        fldpi                       ; load pi
+        fcompp                      ; compare pi and angle ; pop twice
+        push ax
+        fstsw ax
+        sahf
+        pop ax
+        jc @f                       ; carry set if pi < angle (positive slope)
+        
+        bts word [ball.direction], d.bit.Y
+        jmp .end
+        
+        @@:
+        btr word [ball.direction], d.bit.Y
+        
     .end:
-        fstp dword [ball.slope]
         ret
  
 ; void nextPosition(void)
