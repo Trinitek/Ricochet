@@ -64,6 +64,19 @@ main:
             mov bx, word [ball.y]
             call drawBall
             
+            mov ax, field.xMin
+            mov bx, field.yMax - 1
+            mov cl, btype.BLUE
+            call drawBrick
+            
+            add ax, brick.width
+            mov cl, btype.RED
+            call drawBrick
+            
+            add ax, brick.width
+            mov cl, btype.GREEN
+            call drawBrick
+            
             mov ax, 0xA000          ; draw buffer A to screen
             mov es, ax
             mov ax, word [bufferA]
@@ -94,7 +107,12 @@ main:
             add word [paddle.x], ax
             
         pop cx
-        loop .mainLoop
+        ;loop .mainLoop             ; jmp out of range
+        loop .mainLoop.again
+        jmp .mainLoop.terminate
+        .mainLoop.again:
+            jmp .mainLoop
+        .mainLoop.terminate:
     
     @@:
     

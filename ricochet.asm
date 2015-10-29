@@ -38,6 +38,7 @@ include 'paddle.inc'
 include 'field.inc'
 include 'palette.inc'
 include 'sprites.inc'
+include 'brick.inc'
 
 include 'main.asm'
 include 'ball.asm'

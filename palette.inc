@@ -13,6 +13,17 @@ macro color cName*, r*, g*, b* {
     paletteIndex_ = paletteIndex_ + 1
 }
 
+macro colormap cmName*, [colors*] {
+    common
+        postpone \{
+            cm.#cmName:
+        \}
+    forward
+        postpone \{
+            db colors
+        \}
+}
+
 color ALPHA, 0, 0, 0
 color BLACK, 0, 0, 0
 color BLUE, 0, 0, 255
@@ -28,3 +39,9 @@ color WHITE60, 153, 153, 153
 color WHITE80, 204, 204, 204
 color WHITE, 255, 255, 255
 color AQUA, 0, 255, 255
+color RED, 255, 0, 0
+color DARKRED, 127, 0, 0
+color LIGHTRED, 255, 127, 127
+color GREEN, 0, 255, 0
+color DARKGREEN, 0, 127, 0
+color LIGHTGREEN, 127, 255, 127

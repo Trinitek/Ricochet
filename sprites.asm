@@ -51,11 +51,15 @@ sprites:
         c.AQUA,\
         c.DARKBLUE,\
         c.BLUE
+    .brickmap brickSprite 0, 1, 2
 
-; void drawSprite(word x, word y, word height, word width, word <si> spritePtr)
+; void drawSprite(word x, word y, word height, word width, word <si> spritePtr, word <di> colorMapPtr)
 ; Assumes DS is set to the data segment and ES to any video buffer
+; If DI is null, no color map is used to draw the sprite.
 drawSprite:
     pusha
+    
+    mov word [.colormap], di
     
     push ax
     call coordToPtr
@@ -74,9 +78,21 @@ drawSprite:
             ja @f
         
             mov dl, byte [ds:si]
-            cmp dl, c.ALPHA
-            je @f
-            mov byte [es:di], dl
+            cmp word [.colormap], 0
+            jz .putPixel
+            
+            .loadFromMap:
+                push bx
+                mov bx, word [.colormap]
+                mov dh, 0
+                add bx, dx
+                mov dl, byte [ds:bx]
+                pop bx
+        
+            .putPixel:
+                cmp dl, c.ALPHA
+                je @f
+                mov byte [es:di], dl
         
             @@:
             inc si
@@ -97,11 +113,14 @@ drawSprite:
     popa
     ret
     
+    .colormap dw ?
+    
 ; void drawBorder(void)
 ; Expects ES to point to buffer B
 drawBorder:
     pusha
     
+    xor di, di
     mov ax, field.xMin - 9
     mov bx, field.yMin
     mov dx, vertWallSprite.width
@@ -155,10 +174,11 @@ drawBorder:
     ret
     
 ; void drawPaddle(word x, word y)
-; Expect ES to point to buffer A
+; Expects ES to point to buffer A
 drawPaddle:
     pusha
     
+    xor di, di
     mov cx, leftPaddleCapSprite.height
     mov dx, leftPaddleCapSprite.width
     mov si, sprites.lPaddle
@@ -185,14 +205,47 @@ drawPaddle:
     ret
     
 ; void drawBall(word x, word y)
-; Expect ES to point to buffer A
+; Expects ES to point to buffer A
 drawBall:
     pusha
+    
     sub ax, ballSprite.hotspot_xy
     add bx, ballSprite.hotspot_xy
     mov cx, ballSprite.height
     mov dx, ballSprite.width
     mov si, sprites.ball
+    xor di, di
+    call drawSprite
+    
+    popa
+    ret
+    
+; void drawBrick(word x, word y, byte <cl enum btype> type)
+; Expects ES to point to buffer A
+drawBrick:
+    pusha
+    
+    cmp cl, btype.RED
+    jne @f
+    mov di, cm.REDBRICK
+    jmp .draw
+    @@:
+    cmp cl, btype.GREEN
+    jne @f
+    mov di, cm.GREENBRICK
+    jmp .draw
+    @@:
+    cmp cl, btype.BLUE
+    jne @f
+    mov di, cm.BLUEBRICK
+    jmp .draw
+    @@:
+    xor di, di
+    
+    .draw:
+    mov cx, brickSprite.height
+    mov dx, brickSprite.width
+    mov si, sprites.brickmap
     call drawSprite
     
     popa

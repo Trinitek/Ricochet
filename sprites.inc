@@ -81,3 +81,18 @@ paddleBodySprite.width = 1
 struc paddleBodySprite a*, b*, c* {
     db a,b,c,b,c,b,c,b,a
 }
+
+brickSprite.height = 10
+brickSprite.width = 20
+struc brickSprite a*, b*, c* {
+    db a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,b
+    db a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,b,b
+    db a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,b,b,b
+    db a,a,a,c,c,c,c,c,c,c,c,c,c,c,c,c,c,b,b,b
+    db a,a,a,c,c,c,c,c,c,c,c,c,c,c,c,c,c,b,b,b
+    db a,a,a,c,c,c,c,c,c,c,c,c,c,c,c,c,c,b,b,b
+    db a,a,a,c,c,c,c,c,c,c,c,c,c,c,c,c,c,b,b,b
+    db a,a,a,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b
+    db a,a,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b
+    db a,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b
+}
