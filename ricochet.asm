@@ -45,10 +45,3 @@ include 'paddle.asm'
 include 'buffer.asm'
 include 'sprites.asm'
 include 'palette.asm'
-
-postpone {
-    ;align 16
-    ;newStackSeg = $ / 16
-    ;newStackOfs = $ + 0x0FFE
-    ;endOfProgram = $ + 0x1000
-}
