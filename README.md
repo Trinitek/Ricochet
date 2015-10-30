@@ -15,4 +15,4 @@ To assemble, run `fasm ricochet.asm -d _target=[target]`
 For more information on the MikeOS project, see http://mikeos.sourceforge.net
 
 ####Screenshots
-<img src="screenshots/1.png">
+<img src="screenshots/2.png">
