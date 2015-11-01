@@ -64,29 +64,6 @@ main:
             mov bx, word [ball.y]
             call drawBall
             
-            mov ax, field.xMin
-            mov bx, field.yMax - 1
-            mov cl, btype.BLUE
-            call drawBrick
-            
-            add ax, brick.width
-            mov cl, btype.RED
-            call drawBrick
-            
-            add ax, brick.width
-            mov cl, btype.GREEN
-            call drawBrick
-            
-            rept 7 {
-                add ax, brick.width
-                call drawBrick
-            }
-            
-            rept 14 {
-                sub bx, brick.height
-                call drawBrick
-            }
-            
             mov ax, 0xA000          ; draw buffer A to screen
             mov es, ax
             mov ax, word [bufferA]
