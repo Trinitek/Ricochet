@@ -39,6 +39,7 @@ include 'field.inc'
 include 'palette.inc'
 include 'sprites.inc'
 include 'brick.inc'
+include 'level.inc'
 
 include 'main.asm'
 include 'ball.asm'
@@ -46,3 +47,8 @@ include 'paddle.asm'
 include 'buffer.asm'
 include 'sprites.asm'
 include 'palette.asm'
+
+postpone {
+    uninitialized:
+    .brickobj.data: rb brickobj.size * level.width * level.height
+}

@@ -2,6 +2,15 @@
 define brick.width brickSprite.width
 define brick.height brickSprite.height
 
+virtual at 0
+    brickobj:
+    .bricktype db ?
+    .x dw ?
+    .y dw ?
+    align 8
+    brickobj.size = $ - brickobj
+end virtual
+
 enum btype,\
     RED,\
     GREEN,\
