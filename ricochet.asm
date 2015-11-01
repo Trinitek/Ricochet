@@ -51,4 +51,12 @@ include 'palette.asm'
 postpone {
     uninitialized:
     .brickobj.data: rb brickobj.size * level.width * level.height
+    
+    .end:
+    if _target = target.dos & 65535 - .end < 1024
+        display '!! Warning: stack space is less than 1024 bytes!'
+    end if
+    if _target = target.mikeos & $ > 65535
+        display '!! Warning: program is larger than 32768 bytes!'
+    end if
 }
