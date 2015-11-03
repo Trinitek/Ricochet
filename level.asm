@@ -42,8 +42,34 @@ unpackLevel:
     .x dw ?
     .y dw ?
 
-; void drawLevel(word levelPtr)
+; void drawLevel(void)
+; Expects ES to point to buffer A
+;
+; Reads the brick objects from the array and displays them to the screen.
 drawLevel:
     pusha
+    
+    mov si, uninitialized.brickobj.data
+    
+    mov cx, level.width * level.height
+    .readBrick:
+        lodsb
+        cmp al, btype.NULL          ; skip entry if block type is null
+        jne @f
+        add si, brickobj.size - 1
+        loop .readBrick
+        jmp .end
+        
+        @@:
+        mov cl, al
+        lodsw                       ; load x and y coordinates
+        mov bx, ax
+        lodsw
+        xchg ax, bx
+        call drawBrick
+        
+        loop .readBrick
+    
+    .end:
     popa
     ret
