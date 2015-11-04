@@ -47,10 +47,11 @@ include 'paddle.asm'
 include 'buffer.asm'
 include 'sprites.asm'
 include 'palette.asm'
+include 'level.asm'
 
 postpone {
     uninitialized:
-    .brickobj.data: rb brickobj.size * level.width * level.height
+    .currentLevel: rb level.width * level.height
     
     .end:
     if _target = target.dos & 65535 - .end < 1024
