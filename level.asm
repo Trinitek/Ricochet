@@ -1,5 +1,7 @@
 
 ; void unpackLevel(byte <al> levelNumber)
+;
+; Loads the read-only level information into working memory.
 unpackLevel:
     pusha
     
@@ -9,38 +11,12 @@ unpackLevel:
     mov ah, 0
     mul dx
     add si, ax
-    
-    mov di, uninitialized.brickobj.data
-    mov word [.x], 0
-    mov word [.y], 0
-    
+    mov di, uninitialized.currentLevel
     mov cx, level.width * level.height
-    .unpack:
-        movsb
-        mov ax, word [.x]
-        stosw
-        mov ax, word [.y]
-        stosw
-        add di, brickobj.size
-        
-        .next:
-            inc word [.x]
-            cmp word [.x], level.width
-            jb @f
-            mov word [.x], 0
-            inc word [.y]
-        loop .unpack
-        jmp .end
-            @@:
-            inc word [.x]
-        loop .unpack
+    rep movsb
     
-    .end:
     popa
     ret
-    
-    .x dw ?
-    .y dw ?
 
 ; void drawLevel(void)
 ; Expects ES to point to buffer A
@@ -49,25 +25,29 @@ unpackLevel:
 drawLevel:
     pusha
     
-    mov si, uninitialized.brickobj.data
-    
+    mov dx, field.xMin
+    mov bx, field.yMax
+    mov si, uninitialized.currentLevel
     mov cx, level.width * level.height
     .readBrick:
         lodsb
         cmp al, btype.NULL          ; skip entry if block type is null
-        jne @f
-        add si, brickobj.size - 1
-        loop .readBrick
-        jmp .end
+        je .nextPosition
         
-        @@:
+        push cx
         mov cl, al
-        lodsw                       ; load x and y coordinates
-        mov bx, ax
-        lodsw
-        xchg ax, bx
+        mov ax, dx
         call drawBrick
+        pop cx
         
+        .nextPosition:
+            add dx, brick.width
+            cmp dx, field.xMax
+            jb @f
+            mov dx, field.xMin
+            sub bx, brick.height
+        
+            @@:
         loop .readBrick
     
     .end:

@@ -17,6 +17,8 @@ main:
     call initializeTimer
     call initializeBall
     call newTrajectory
+    mov al, 1
+    call unpackLevel
     
     mov ax, word [bufferB]          ; clear buffer B
     mov es, ax
@@ -55,6 +57,8 @@ main:
             
             push cs                 ; DS = CS
             pop ds
+            
+            call drawLevel
             
             mov ax, word [paddle.x]
             mov bx, word [paddle.y]
