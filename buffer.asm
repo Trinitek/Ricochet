@@ -62,6 +62,7 @@ setVideoBufferSeg:
         mov word [bufferA], ax
         add ax, 0x1000
         mov word [bufferB], ax
+        xor si, si                  ; no errors thrown by MikeOS version
     end if
     
     .end:
