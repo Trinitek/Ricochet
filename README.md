@@ -3,7 +3,7 @@ Ricochet
 
 A Breakout-like game for MS-DOS and MikeOS
 
-####Building Ricochet
+## Building Ricochet
 This project requires FASM 1.x (http://flatassembler.net).
 
 To assemble, run `fasm ricochet.asm -d _target=[target]`
@@ -14,5 +14,5 @@ To assemble, run `fasm ricochet.asm -d _target=[target]`
 
 For more information on the MikeOS project, see http://mikeos.sourceforge.net
 
-####Screenshots
+## Screenshots
 <img src="screenshots/3.png">
